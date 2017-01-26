@@ -1,6 +1,7 @@
 function main() {
   var sheet = SpreadsheetApp.getActiveSheet();
   var range = sheet.getRange('B2:G9');
+  var bgColors = range.getBackgrounds();  //背景色の取得
   var values = range.getValues();
   
   var period = 0;
@@ -15,7 +16,11 @@ function main() {
         w +=1;
         continue;
       }else{
-        pushToCalendar(calendar,values[i][j],period,w)
+        var l4 = false;            //ロンフォーかどうかのフラグ 
+        if (bgColors[i][j] != "#ffffff" && bgColors[i][j] != "#f0f8ff"){
+          l4 = true;
+        }
+        pushToCalendar(calendar,values[i][j],period,w,l4)
         Logger.log(values[i][j]);
         w +=1;
       }
@@ -25,7 +30,7 @@ function main() {
   }
 }
 
-function pushToCalendar(calendar,value,period,w){
+function pushToCalendar(calendar,value,period,w,l4){
   
   // new func to get this monday
   var bginSemMon = thisMonday();
@@ -34,13 +39,17 @@ function pushToCalendar(calendar,value,period,w){
   var monday = bginSemMon.getDate();
   
   var day = monday+w;
-  var min = setPeriod(period);
+  var startMin = setPeriod(period);
+  var endMin = startMin + 70;
+  if(l4 == true){
+    startMin = startMin-35;
+  }
   
   // 10:10 => 00:610, set only by minutes
-  Logger.log(new Date(year,month,day,0,min));
+  Logger.log(new Date(year,month,day,0,startMin));
   
-  var start_date = new Date(year,month,day,0,min);
-  var end_date = new Date(year,month,day,0,min+70);
+  var start_date = new Date(year,month,day,0,startMin);
+  var end_date = new Date(year,month,day,0,endMin);
   // add function
   var recurrence = CalendarApp.newRecurrence().addWeeklyRule().until(endTermDate());
   
